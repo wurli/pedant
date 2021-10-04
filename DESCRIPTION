@@ -1,7 +1,7 @@
 Package: pedant
 Type: Package
 Title: Make Function Calls Explicit
-URL: http://wurli.github.io/pedant/
+URL: https://github.com/wurli/pedant
 Version: 0.1.0
 Author: Jacob Scott
 Maintainer: Jacob Scott <jscott2718@gmail.com>
@@ -18,3 +18,4 @@ Suggests:
     rstudioapi,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+BugReports: https://github.com/wurli/pedant/issues
