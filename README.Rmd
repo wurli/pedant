@@ -14,6 +14,10 @@ knitr::opts_knit$set(
 )
 ```
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/wurli/pedant/workflows/R-CMD-check/badge.svg)](https://github.com/wurli/pedant/actions)
+<!-- badges: end -->
+
 # {pedant}
 `{pedant}` lets you quickly transform R code to *pedantically* use implicit
 function calls instead of implicit, either by running `add_double_colons()` or
