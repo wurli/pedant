@@ -55,3 +55,6 @@ calls and am then faced with the onerous task of cleaning up my own
 code. I wrote this package so I can continue this bad habit.
 
 # Bug reports / feature requests
+
+Please post these as issues on
+[github](https://github.com/wurli/pedant/issues)
