@@ -1,5 +1,9 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- badges: start -->
+
+[![R-CMD-check](https://github.com/wurli/pedant/workflows/R-CMD-check/badge.svg)](https://github.com/wurli/pedant/actions)
+<!-- badges: end -->
 
 # {pedant}
 
@@ -30,19 +34,24 @@ argument to `add_double_colons()`:
 ``` r
 library(dplyr, warn.conflicts = FALSE)
 
-code <- "
-  cars <- as_tibble(mtcars)
-  cars %>%
+code <- 
+ "mtcars %>%
     filter(mpg > 20) %>%
-    summarise(across(everything(), n_distinct))
-"
+    summarise(across(everything(), n_distinct))"
+
 # Code will be transformed to use the double-colon operator, but notice
 # that `n_distinct` is not transformed as it is not followed by `()`
 cat(add_double_colons(code))
 ```
 
-    ## 
-    ##   cars <- dplyr::as_tibble(mtcars)
-    ##   cars %>%
+    ## mtcars %>%
     ##     dplyr::filter(mpg > 20) %>%
     ##     dplyr::summarise(dplyr::across(dplyr::everything(), n_distinct))
+
+# Why?
+
+Often, during package development I forget to use explicit function
+calls and am then faced with the onerous task of cleaning up my own
+code. I wrote this package so I can continue this bad habit.
+
+# Bug reports / feature requests
