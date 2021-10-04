@@ -6,3 +6,4 @@
 ^pkgdown$
 ^README\.Rmd$
 ^\.github$
+^hex\.R$

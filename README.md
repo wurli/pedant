@@ -5,14 +5,16 @@
 [![R-CMD-check](https://github.com/wurli/pedant/workflows/R-CMD-check/badge.svg)](https://github.com/wurli/pedant/actions)
 <!-- badges: end -->
 
-# {pedant}
+# {pedant} <img src="man/figures/logo.png" align="right" width="200" />
 
 `{pedant}` lets you quickly transform R code to *pedantically* use
 implicit function calls instead of implicit, either by running
 `add_double_colons()` or using the handy RStudio addin
 `"Make function calls explicit"`.
 
-![RStudio addin demo](man/figures/addin-demo.gif)
+<figure>
+<img src="man/figures/addin-demo.gif" style="width:75.0%" alt="RStudio addin demo" /><figcaption aria-hidden="true">RStudio addin demo</figcaption>
+</figure>
 
 # Installation
 

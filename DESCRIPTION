@@ -1,6 +1,7 @@
 Package: pedant
 Type: Package
 Title: Make Function Calls Explicit
+URL: http://wurli.github.io/pedant/
 Version: 0.1.0
 Author: Jacob Scott
 Maintainer: Jacob Scott <jscott2718@gmail.com>
