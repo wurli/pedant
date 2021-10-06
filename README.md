@@ -8,7 +8,7 @@
 # {pedant} <img src="man/figures/logo.png" align="right" width="200" />
 
 `{pedant}` lets you quickly transform R code to *pedantically* use
-implicit function calls instead of implicit, either by running
+explicit function calls instead of implicit, either by running
 `add_double_colons()` or using the handy RStudio addin
 `"Make function calls explicit"`.
 
