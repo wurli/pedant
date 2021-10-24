@@ -99,7 +99,7 @@ imported_functions <- function(dir = ".") {
 #'
 #' @export
 current_packages <- function(dir = ".",
-                             base_packages = c("base", getOption("defaultPackages")),
+                             base_packages = getOption("defaultPackages"),
                              include_types = "Imports") {
 
   out <- if (is_dev_context()) {
@@ -108,6 +108,6 @@ current_packages <- function(dir = ".",
     loaded_packages()
   }
 
-  unique(c(out, base_packages))
+  unique(c(out, base_packages, "base"))
 
 }
