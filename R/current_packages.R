@@ -108,6 +108,6 @@ current_packages <- function(dir = ".",
     loaded_packages()
   }
 
-  unique(c(out, base_packages))
+  unique(c(out, base_packages, "base"))
 
 }

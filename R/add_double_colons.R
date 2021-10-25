@@ -71,7 +71,7 @@ add_double_colons <- function(code = NULL,
 
   # Regular expression to extract function calls
   backticks_fns <- "`[^`]+`(?= *[(])"
-  syntactic_fns <- "(?<=[^a-zA-Z_]|^)[a-zA-Z_]+(?= *[(])"
+  syntactic_fns <- "(?<=[^a-zA-Z_]|^)[a-zA-Z._]+(?= *[(])"
   exclude_dcs   <- "(?<!::)"
   funs_regex    <- sprintf("%s(%s|%s)", exclude_dcs, backticks_fns, syntactic_fns)
 
