@@ -2,12 +2,31 @@
   if (length(x) == 0) y else x
 }
 
-str_extract_all <- function(x, pattern, invert = FALSE) {
-  regmatches(x, gregexpr(pattern, x, perl = TRUE), invert)[[1]]
+# strip_quotes(c("'`backticks and single`'", '"double"', "`one backtick"))
+strip_quotes <- function(x, quotes = c('"', "'", "`"), passes = 1) {
+  
+  if (length(x) == 0) {
+    return(x)
+  }
+  
+  passes <- min(passes, length(quotes))
+  
+  is_quoted <- function(x) {
+    tests <- lapply(quotes, function(q) startsWith(x, q) & endsWith(x, q))
+    Reduce(`|`, tests)
+  }
+  
+  unquote <- function(x) substr(x, 2, nchar(x) - 1)
+  
+  pass_n <- rep(1, length(x))
+  
+  for (i in seq_len(passes)) {
+    run <- is_quoted(x) & i <= passes
+    x <- ifelse(run, unquote(x), x)
+    pass_n <- pass_n + as.numeric(run)
+  }
+  
+  x
+  
 }
 
-str_replace_all <- function(x, pattern, replacement) {
-  regex <- gregexpr(pattern, x, perl = TRUE)
-  regmatches(x, regex)[[1]] <- replacement
-  x
-}

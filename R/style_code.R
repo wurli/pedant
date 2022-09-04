@@ -20,9 +20,9 @@
 #'
 #' @param code Code to transform. Either a character vector or `NULL`, in which
 #'   case any highlighted code (in RStudio) will be used.
-#' @param use_packages A character vector of package names. The order is
+#' @param packages A character vector of package names. The order is
 #'   important here - see examples for details.
-#' @param ignore_functions Functions to ignore when applying the transformation
+#' @param ignore Functions to ignore when applying the transformation
 #'
 #' @return The transformed `code` as a character string
 #' @export
@@ -40,30 +40,16 @@
 #' cat(add_double_colons(code, "dplyr"))
 #'
 #' # You can specify functions that shouldn't be transformed:
-#' cat(add_double_colons(code, "dplyr", ignore_functions = "across"))
+#' cat(add_double_colons(code, "dplyr", ignore = "across"))
 #'
 #' # Beware namespace conflicts! The following are not the same, mimicking
 #' # the effects of reordering calls to `library()`:
 #' cat(add_double_colons(code, c("dplyr", "stats")))
 #'
 #' cat(add_double_colons(code, c("stats", "dplyr")))
-add_double_colons <- function(code = NULL,
-                              use_packages = current_packages(),
-                              ignore_functions = imported_functions()) {
-
-  # Error trapping + check if we're replacing highlighted code
-  if (is.null(code)) {
-    if (!requireNamespace("rstudioapi", quietly = TRUE)) {
-      stop("{rstudioapi} must be installed")
-    }
-    if (!rstudioapi::isAvailable()) {
-      stop("RStudio is not available")
-    }
-    replace_selection <- TRUE
-    code <- rstudioapi::selectionGet()$value
-  } else {
-    replace_selection <- FALSE
-  }
+style_code <- function(code = NULL,
+                       packages = guess_packages(code),
+                       ignore = imported_functions()) {
 
   # Need to make this small adjustment to (very badly styled) code since
   # variable-length lookbehinds aren't possible
@@ -79,23 +65,24 @@ add_double_colons <- function(code = NULL,
   called_funs <- unique(all_calls)
 
   # Get a lookup list of names = packages, values = namespace exports
-  pkg_lookup        <- lapply(use_packages, getNamespaceExports)
-  names(pkg_lookup) <- use_packages
+  pkg_lookup        <- lapply(packages, getNamespaceExports)
+  names(pkg_lookup) <- packages
 
   # Helper to retrieve the `pkg::fun` text for a function `fun`
   get_pkg <- function(fun) {
 
     fun1 <- gsub("(^`)|(`$)", "", fun)
 
-    for (pkg in use_packages) {
+    for (pkg in packages) {
       if (fun1 %in% pkg_lookup[[pkg]]) {
-        if (pkg == "base" || fun1 %in% ignore_functions) {
+        if (pkg == "base" || fun1 %in% ignore) {
           return(fun)
         } else {
           return(paste0(pkg, "::", fun))
         }
       }
     }
+    
     NA_character_
   }
 
@@ -118,12 +105,8 @@ add_double_colons <- function(code = NULL,
   replacements <- called_funs_pkgs[
     vapply(all_calls, function(x) which(names(called_funs_pkgs) == x), integer(1))
   ]
+  
   out <- str_replace_all(code, funs_regex, replacements)
-
-  if (replace_selection) {
-    rstudioapi::insertText(out)
-    return(invisible(out))
-  }
 
   out
 
