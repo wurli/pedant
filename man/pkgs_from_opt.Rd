@@ -9,7 +9,10 @@
 \usage{
 pkgs_from_opt(opt = "pedant_packages")
 
-pkgs_from_library_calls(code, funs = c("library", "require"))
+pkgs_from_library_calls(
+  code,
+  funs = c("library", "require", "requireNamespace")
+)
 
 pkgs_from_desc(dir = ".", types = "Imports")
 

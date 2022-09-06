@@ -4,11 +4,7 @@
 \alias{style_code}
 \title{Make function calls explicit}
 \usage{
-style_code(
-  code = NULL,
-  packages = current_packages(),
-  ignore = imported_functions()
-)
+style_code(code, packages = pkgs_from_search_path(), ignore)
 }
 \arguments{
 \item{code}{Code to transform. Either a character vector or \code{NULL}, in which

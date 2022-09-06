@@ -22,4 +22,5 @@ Config/testthat/edition: 3
 BugReports: https://github.com/wurli/pedant/issues
 Imports: 
     cli,
-    rlang
+    rlang,
+    utils
