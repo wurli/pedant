@@ -10,17 +10,19 @@ Description: Transform code from using implicit function calls to explicit
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.1.9000
 Roxygen: list(markdown = TRUE)
 Suggests: 
     dplyr,
     pkgload,
     readr,
     rstudioapi,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    tibble
 Config/testthat/edition: 3
 BugReports: https://github.com/wurli/pedant/issues
 Imports: 
     cli,
+    glue,
     rlang,
     utils

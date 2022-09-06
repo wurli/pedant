@@ -2,6 +2,10 @@
   if (length(x) == 0) y else x
 }
 
+`%if_na%` <- function(x, y) {
+  ifelse(is.na(x), y, x)
+}
+
 # strip_quotes(c("'`backticks and single`'", '"double"', "`one backtick"))
 strip_quotes <- function(x, quotes = c('"', "'", "`"), passes = 1) {
   
@@ -12,8 +16,8 @@ strip_quotes <- function(x, quotes = c('"', "'", "`"), passes = 1) {
   passes <- min(passes, length(quotes))
   
   is_quoted <- function(x) {
-    tests <- lapply(quotes, function(q) startsWith(x, q) & endsWith(x, q))
-    Reduce(`|`, tests)
+    tests <- map(quotes, function(q) startsWith(x, q) & endsWith(x, q))
+    reduce(tests, `|`)
   }
   
   unquote <- function(x) substr(x, 2, nchar(x) - 1)
@@ -63,3 +67,52 @@ parse_code <- function(code) {
 
   
 }
+
+count <- function(x, ..., .wt = NULL) {
+  
+  cols <- c(...)
+  
+  levels <- do.call(paste, x[cols])
+  
+  groups <- split(x, levels)
+  
+  counted_groups <- map(groups, function(df) {
+    
+    .wt <- if (is.null(.wt)) 1 else sum(df[[.wt]])
+    
+    cbind(
+      df[1, cols], 
+      data.frame(n = nrow(df) * .wt)
+    )
+  })
+  
+  unordered_result <- do.call(rbind, counted_groups)
+  
+  unordered_result[do.call(order, unordered_result), , drop = FALSE]
+  
+}
+
+comma <- function(x, fixed_width = FALSE) {
+  format(x, big.mark = ",", scientific = FALSE, trim = !fixed_width)
+}
+
+justify <- function(x, just = c("left", "right", "centre")) {
+  
+  chars  <- nchar(x)
+  n      <- max(chars) - chars
+  spaces <- function(x) strrep(" ", x) 
+  
+  switch(
+    just[1],
+    left   = paste0(x, spaces(n)),
+    right  = paste0(spaces(n), x),
+    centre = paste0(spaces(floor(n / 2)), x, spaces(ceiling(n / 2)))
+  )
+  
+}
+
+style_pedant_run <- function(code, text = code) {
+  href <- paste0("ide:run:pedant::", code)
+  style_hyperlink(text, href)
+}
+

@@ -4,10 +4,10 @@ style_files <- function(files = list.filess(c(".", "R"), pattern = "\\.R$", full
   
   names(files) <- files
   
-  files <- lapply(files, read_file)
-  files <- lapply(files, style_code)
+  files <- map(files, read_file)
+  files <- map(files, style_code)
   
-  lapply(files, write_file)
+  map(files, write_file)
   
   invisible(files)
   

@@ -4,7 +4,7 @@
 \alias{style_code}
 \title{Make function calls explicit}
 \usage{
-style_code(code, packages = pkgs_from_search_path(), ignore)
+style_code(code, packages = NULL, ignore = NULL)
 }
 \arguments{
 \item{code}{Code to transform. Either a character vector or \code{NULL}, in which
@@ -38,6 +38,14 @@ imports any packages in their entirety (i.e if \verb{Import pkg} appears in the
 \code{NAMESPACE} file), calls to functions from these packages will be left
 unchanged.
 See \code{current_packages()} for more information.
+}
+
+TODO:
+\itemize{
+\item figure out what to do with specials, e.g. \%||\%. Probs leave them alone
+but add a msg about it
+\item Add an 'undo' feature
+\item Better messages. Should be quite informative I think
 }
 }
 \examples{

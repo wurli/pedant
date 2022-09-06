@@ -136,10 +136,10 @@ get_imports <- function(dir = ".") {
   if (is.null(imports)) return(NULL)
   
   out <- list(
-    packages  = lapply(imports, function(x) if (length(x) == 1) x else NULL),
-    functions = lapply(imports, function(x) x[-1])
+    packages  = map(imports, function(x) if (length(x) == 1) x else NULL),
+    functions = map(imports, function(x) x[-1])
   )
   
-  lapply(out, unlist, use.names = FALSE)$packages
+  map(out, unlist, use.names = FALSE)$packages
   
 }
