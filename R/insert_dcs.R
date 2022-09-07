@@ -29,6 +29,8 @@ insert_dcs <- function(code, packages = NULL, ignore = NULL, src = NULL) {
   pd <- pd[order(pd$line1, pd$col1), , drop = FALSE]
   pd <- transform(pd, new_col1 = col1, new_col2 = col2)
   
+  pd$shifts <- 0
+  
   code <- strsplit(code, "\n")[[1]]
   
   for (r in seq_len(nrow(pd))) {
@@ -38,11 +40,14 @@ insert_dcs <- function(code, packages = NULL, ignore = NULL, src = NULL) {
     line       <- pd_row$line1 
     code[line] <- with(pd_row, replace_substr(code[line], new_col1, new_col2, new_text))
     
+    shift_col <- pd$line1 == pd_row$line1 & pd$new_col1 >= pd_row$new_col1
+    
     # Adjust `col1` and `col2` to account for new number of chars
     pd <- transform(
       pd, 
-      new_col1 = ifelse(line1 > pd_row$line1, new_col1, new_col1 + width_diff),
-      new_col2 = ifelse(line1 > pd_row$line1, new_col2, new_col2 + width_diff)
+      new_col1 = ifelse(shift_col, new_col1 + width_diff, new_col1),
+      new_col2 = ifelse(shift_col, new_col2 + width_diff, new_col2),
+      shifts = shifts + shift_col
     )
     
   }

@@ -16,6 +16,7 @@ knitr::opts_knit$set(
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/wurli/pedant/workflows/R-CMD-check/badge.svg)](https://github.com/wurli/pedant/actions)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
 # {pedant} <img src="man/figures/logo.png" align="right" width="200" />

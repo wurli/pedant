@@ -6,44 +6,6 @@
   ifelse(is.na(x), y, x)
 }
 
-# strip_quotes(c("'`backticks and single`'", '"double"', "`one backtick"))
-strip_quotes <- function(x, quotes = c('"', "'", "`"), passes = 1) {
-  
-  if (length(x) == 0) {
-    return(x)
-  }
-  
-  passes <- min(passes, length(quotes))
-  
-  is_quoted <- function(x) {
-    tests <- map(quotes, function(q) startsWith(x, q) & endsWith(x, q))
-    reduce(tests, `|`)
-  }
-  
-  unquote <- function(x) substr(x, 2, nchar(x) - 1)
-  
-  pass_n <- rep(1, length(x))
-  
-  for (i in seq_len(passes)) {
-    run <- is_quoted(x) & i <= passes
-    x <- ifelse(run, unquote(x), x)
-    pass_n <- pass_n + as.numeric(run)
-  }
-  
-  x
-  
-}
-
-replace_substr <- function(x, start, stop, replacement) {
-  
-  paste0(
-    substr(x, 0, start - 1),
-    replacement,
-    substr(x, stop + 1, nchar(x))
-  )
-  
-}
-
 parse_code <- function(code) {
   
   force(code)
@@ -92,6 +54,7 @@ count <- function(x, ..., .wt = NULL) {
   
 }
 
+# Text utils ------------------------------------------------------------------
 comma <- function(x, fixed_width = FALSE) {
   format(x, big.mark = ",", scientific = FALSE, trim = !fixed_width)
 }
@@ -111,15 +74,85 @@ justify <- function(x, just = c("left", "right", "centre")) {
   
 }
 
-style_pedant_run <- function(code, text = code) {
+style_run <- function(code, text = code) {
   href <- paste0("ide:run:pedant::", code)
   style_hyperlink(text, href)
 }
 
-defer <- function(expr, envir = parent.frame()) {
-  call <- substitute(
-    evalq(expr, envir = envir),
-    list(expr = substitute(expr), envir = parent.frame())
+style_maybe_run <- function(code, text) {
+  
+  if (is_installed("rstudioapi") && rstudioapi::isAvailable("2022.07.1")) {
+    style_run(code, paste("Click here to", text))
+  } else {
+    format_inline("Use {.code {code}} to {text}")
+  }
+  
+}
+
+style_open_file <- function(file, text = NULL, line = NULL, col = NULL) {
+  
+  if (is.null(text)) {
+    
+    text <- file
+    
+    if (!is.null(line) || !is.null(col)) {
+      text <- paste0(text, ":", line %||% 1, ":", col %||% 1)
+    }
+    
+    text <- format_inline("{.file {text}}")
+    
+  }
+  
+  if (!file.exists(file)) {
+    return(text)
+  }
+  
+  style_hyperlink(text, paste0("file://", file), c(line = line, col = col))
+  
+}
+
+# strip_quotes(c("'`backticks and single`'", '"double"', "`one backtick"))
+strip_quotes <- function(x, quotes = c('"', "'", "`"), passes = 1) {
+  
+  if (length(x) == 0) {
+    return(x)
+  }
+  
+  passes <- min(passes, length(quotes))
+  
+  is_quoted <- function(x) {
+    tests <- map(quotes, function(q) startsWith(x, q) & endsWith(x, q))
+    reduce(tests, `|`)
+  }
+  
+  unquote <- function(x) substr(x, 2, nchar(x) - 1)
+  
+  pass_n <- rep(1, length(x))
+  
+  for (i in seq_len(passes)) {
+    run <- is_quoted(x) & i <= passes
+    x <- ifelse(run, unquote(x), x)
+    pass_n <- pass_n + as.numeric(run)
+  }
+  
+  x
+  
+}
+
+replace_substr <- function(x, start, stop, replacement, ...) {
+  
+  if (is_formula(replacement)) {
+    replacement <- as_function(replacement)
+  }
+  
+  if (is.function(replacement)) {
+    replacement <- replacement(substr(x, start, stop), ...)
+  }
+  
+  paste0(
+    substr(x, 0, start - 1),
+    replacement,
+    substr(x, stop + 1, nchar(x))
   )
-  do.call(on.exit, list(substitute(call), add = TRUE), envir = envir)
+  
 }

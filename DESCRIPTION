@@ -23,6 +23,7 @@ BugReports: https://github.com/wurli/pedant/issues
 Imports: 
     cli,
     glue,
+    lifecycle,
     rlang,
     utils
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.1.9000
