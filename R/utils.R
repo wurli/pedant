@@ -116,3 +116,10 @@ style_pedant_run <- function(code, text = code) {
   style_hyperlink(text, href)
 }
 
+defer <- function(expr, envir = parent.frame()) {
+  call <- substitute(
+    evalq(expr, envir = envir),
+    list(expr = substitute(expr), envir = parent.frame())
+  )
+  do.call(on.exit, list(substitute(call), add = TRUE), envir = envir)
+}
