@@ -4,7 +4,7 @@
 \alias{style_code}
 \title{Make function calls explicit}
 \usage{
-style_code(code, packages = NULL, ignore = NULL)
+style_code(code, use_pkgs = guess_pkgs(), ignore_funs = NULL)
 }
 \arguments{
 \item{code}{Code to transform. Either a character vector or \code{NULL}, in which

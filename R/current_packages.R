@@ -8,7 +8,7 @@
 #'   
 guess_pkgs <- function(code = NULL,
                        order = c("global_option",
-                                 "package_desc",
+                                 "pkg_desc",
                                  "library_calls")) {
   
   opts <- alist(
@@ -25,7 +25,6 @@ guess_pkgs <- function(code = NULL,
     pkgs <- eval(opts[[opt]])
     
     if (!is.null(pkgs)) {
-      cat("Getting packages from", opt)
       break
     }
     
@@ -48,7 +47,9 @@ guess_pkgs <- function(code = NULL,
 #'
 #' @return A character vector of package names or `NULL`
 pkgs_from_opt <- function(opt = "pedant_pkgs") {
-  getOption(opt)
+  out <- getOption(opt)
+  code <- paste0('getOption("', opt, '")')
+  notify_detected_pkgs(out, format_inline("{.code {code}}"))
 }
 
 #' @rdname pkgs_from_opt
@@ -67,8 +68,7 @@ pkgs_from_opt <- function(opt = "pedant_pkgs") {
 pkgs_from_library_calls <- function(code, 
                                     funs = c(
                                       "library", 
-                                      "require", 
-                                      "requireNamespace"
+                                      "require"
                                     )) {
   
   if (length(code) == 0) {
@@ -77,10 +77,15 @@ pkgs_from_library_calls <- function(code,
   
   code <- paste(code, collapse = "\n")
   
-  regex <- sprintf("(?<=(%s)\\()[^)]+(?=\\))", paste(funs, collapse = "|"))
-  loaded_pkgs <- str_extract_all(code, regex)
+  pd <- parse_code(code)
   
-  unique(strip_quotes(loaded_pkgs))
+  library_parents1 <- subset(pd, terminal & text %in% funs)$parent
+  library_parents2 <- subset(pd, id %in% library_parents1)$parent
+  pd <- subset(pd, parent %in% library_parents2 & !terminal & !text %in% funs)
+  
+  out <- unique(strip_quotes(pd$text))
+  
+  notify_detected_pkgs(out, format_inline("calls to {.fun {funs}} in code"))
   
 }
 
@@ -89,15 +94,36 @@ pkgs_from_library_calls <- function(code,
 #' @param dir A directory in which to search a `DESCRIPTION` and `NAMESPACE` files
 #' @param types A subset of `c("Imports", "Depends", "Suggests", "Enhances", "LinkingTo")`
 pkgs_from_desc <- function(dir = ".", types = "Imports") {
-  setdiff(get_dependencies(dir, types), get_imports(dir))
+  pkgs <- setdiff(get_dependencies(dir, types), get_imports(dir))
+  n <- length(types)
+  notify_detected_pkgs(pkgs, format_inline(
+    "{.field {types}} {qty(n)} field{?s} in project {.file DESCRIPTION}"
+  ))
 }
 
 #' @rdname pkgs_from_opt
 #' 
 #' @param search_path A character vector as returned by `search()`
 pkgs_from_search_path <- function(search_path = search()) {
-  out <- search_path[grepl("^package:", search_path)]
-  sub("^package:", "", out)
+  
+  pkgs <- search_path[grepl("^package:", search_path)]
+  pkgs <- sub("^package:", "", pkgs)
+  
+  notify_detected_pkgs(pkgs, "the search path")
+  
+}
+
+notify_detected_pkgs <- function(pkgs, msg) {
+  
+  if (!is.null(pkgs)) {
+    pkgs <- sort(pkgs)
+    n <- length(pkgs)
+    cli_h2("Restyling using packages from {msg}")
+    cli_bullets(c(i = "{.strong {n}} package{?s} detected: {.pkg {pkgs}}"))
+  }
+  
+  pkgs
+  
 }
 
 get_dependencies <- function(dir = ".",
@@ -105,7 +131,7 @@ get_dependencies <- function(dir = ".",
                                        "Enhances", "LinkingTo")) {
   
   
-  if (!requireNamespace("pkgload", quietly = TRUE)) {
+  if (!is_installed("pkgload")) {
     return(NULL)
   }
   
@@ -124,7 +150,7 @@ get_dependencies <- function(dir = ".",
 
 get_imports <- function(dir = ".") {
   
-  if (!requireNamespace("pkgload", quietly = TRUE)) {
+  if (!is_installed("pkgload")) {
     return(NULL)
   }
   

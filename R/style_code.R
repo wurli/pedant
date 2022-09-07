@@ -53,7 +53,9 @@
 #' cat(add_double_colons(code, c("dplyr", "stats")))
 #'
 #' cat(add_double_colons(code, c("stats", "dplyr")))
-style_code <- function(code, use_pkgs = guess_pkgs(), ignore_funs = NULL) {
+style_code <- function(code, use_pkgs = NULL, ignore_funs = NULL) {
+  
+  use_pkgs <- use_pkgs %||% guess_pkgs(code)
   
   out <- insert_dcs(code, use_pkgs, ignore_funs)
   
@@ -61,7 +63,7 @@ style_code <- function(code, use_pkgs = guess_pkgs(), ignore_funs = NULL) {
   
   last_style()
   
-  invisible(out$styled)
+  invisible(out)
   
 }
 
