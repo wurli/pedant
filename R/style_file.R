@@ -1,5 +1,5 @@
 style_files <- function(files = list.filess(c(".", "R"), pattern = "\\.R$", full.names = TRUE),
-                        packages = current_packages(),
+                        packages = current_pkgs(),
                         ignore = imported_functions()) {
   
   names(files) <- files

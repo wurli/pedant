@@ -1,81 +1,145 @@
-#' Get packages from the current context
-#'
-#' These functions find the packages/functions to use when running
-#' `add_double_colons()`.
-#'
 #' - New behaviour: 
 #'   - Should check a global option
-#'   - Then any `library()` calls
-#'   - Then the `DESCRIPTION` file
+#'   - Then any `library()` calls in selected code.
+#'   - Then the `DESCRIPTION` file if present
 #'   - Then use search path - but you should have to opt in to this because
 #'     it can easily go wrong.
 #'   - Should be much chattier
-#'
-#' - `current_packages()` first checks if the current context is package
-#' development. If it is, then it returns the packages which are listed in the
-#' package `DESCRIPTION` as dependencies, but will not return any packages also
-#' listed as imports in the package `NAMESPACE`. If the current context is not
-#' package development, the currently attached packages (as given by `search()`)
-#' are used. Note that if `{pkgload}` is not installed then the latter option is
-#' always used.
-#' - `imported_functions()` looks for a package `NAMESPACE` file and returns the
-#' names of all imported functions. If a `NAMESPACE` file is not found, or if
-#' `{pkgload}` is not loaded, `NULL` is returned.
-#'
-#' @param dir The current working directory
-#' @param base_packages Default packages to include
-#' @param dev_context Is the current context package development?
-#' @param include_types The types of package imports to return if the current
-#'   context is package development. Should be a subset of
-#'   `c("Imports", "Depends", "Suggests", "Enhances", "LinkingTo")`
-#'
-#' @export
-current_packages <- function(dir = ".",
-                             base_packages = getOption("defaultPackages"),
-                             dev_context = is_dev_context(),
-                             include_types = "Imports") {
+#'   
+guess_pkgs <- function(code = NULL,
+                       order = c("global_option",
+                                 "package_desc",
+                                 "library_calls")) {
   
-  out <- if (dev_context) {
-    dev_context_pkgs(dir, include_types)
-  } else {
-    loaded_packages()
+  opts <- alist(
+    global_option = pkgs_from_opt(),
+    pkg_desc      = pkgs_from_desc(),
+    library_calls = pkgs_from_library_calls(code),
+    search_path   = pkgs_from_search_path()
+  )
+  
+  opts <- opts[order]
+  
+  for (opt in names(opts)) {
+    
+    pkgs <- eval(opts[[opt]])
+    
+    if (!is.null(pkgs)) {
+      cat("Getting packages from", opt)
+      break
+    }
+    
   }
   
-  unique(c(out, base_packages, "base"))
+  pkgs
   
 }
 
-#' @rdname current_packages
-#' @export
-imported_functions <- function(dir = ".") {
-  get_imports(dir)$functions
+#' Get packages to use when inserting `::`
+#'
+#' * `pkgs_from_opt()` checks a global option
+#' * `pkgs_from_library_calls()` checks code for calls to `library()`/`require()`
+#' * `pgks_from_desc()` gets the packages listed in the current
+#'   project's `DESCRIPTION` file, minus any packages which are noted in the 
+#'   `NAMESPACE` file as being imported in their entirety
+#' * `pkgs_from_search_path()` gets the packages which are currently loaded
+#'
+#' @param opt The name of the global option to check
+#'
+#' @return A character vector of package names or `NULL`
+pkgs_from_opt <- function(opt = "pedant_pkgs") {
+  getOption(opt)
 }
 
-
-#' @rdname current_packages
-#' @export
-is_dev_context <- function(dir = ".") {
-  if (!requireNamespace("pkgload", quietly = TRUE)) return(FALSE)
-  tryCatch(
-    {
-      pkgload::pkg_name(dir)
-      TRUE
-    },
-    error = function(e) FALSE
-  )
+#' @rdname pkgs_from_opt
+#' 
+#' @param code A character string containing code to search
+#' @param funs Functions which indicate that a package is available
+#'
+#' @examples
+#' code <- "library(dplyr)
+#' library(`'tidyr'`)
+#' library(\"ggplot2\")
+#' require('`another_pkg`')
+#' do |> some() |> stuff"
+#' 
+#' pkgs_from_library_calls(code)
+pkgs_from_library_calls <- function(code, 
+                                    funs = c(
+                                      "library", 
+                                      "require", 
+                                      "requireNamespace"
+                                    )) {
+  
+  if (length(code) == 0) {
+    return(code)
+  }
+  
+  code <- paste(code, collapse = "\n")
+  
+  regex <- sprintf("(?<=(%s)\\()[^)]+(?=\\))", paste(funs, collapse = "|"))
+  loaded_pkgs <- str_extract_all(code, regex)
+  
+  unique(strip_quotes(loaded_pkgs))
+  
 }
 
-imported_packages <- function(dir = ".") {
-  get_imports(dir)$packages
+#' @rdname pkgs_from_opt
+#'
+#' @param dir A directory in which to search a `DESCRIPTION` and `NAMESPACE` files
+#' @param types A subset of `c("Imports", "Depends", "Suggests", "Enhances", "LinkingTo")`
+pkgs_from_desc <- function(dir = ".", types = "Imports") {
+  setdiff(get_dependencies(dir, types), get_imports(dir))
 }
 
-dev_context_pkgs <- function(dir = ".", types = "Imports") {
-  setdiff(get_dependencies(dir, types), imported_packages(dir))
-}
-
-loaded_packages <- function() {
-  search_path <- search()
+#' @rdname pkgs_from_opt
+#' 
+#' @param search_path A character vector as returned by `search()`
+pkgs_from_search_path <- function(search_path = search()) {
   out <- search_path[grepl("^package:", search_path)]
   sub("^package:", "", out)
 }
 
+get_dependencies <- function(dir = ".",
+                             types = c("Imports", "Depends", "Suggests",
+                                       "Enhances", "LinkingTo")) {
+  
+  
+  if (!requireNamespace("pkgload", quietly = TRUE)) {
+    return(NULL)
+  }
+  
+  types <- match.arg(types, several.ok = TRUE)
+  
+  deps <- tryCatch(
+    pkgload::pkg_desc(dir)$get_deps(),
+    error = function(e) NULL
+  )
+  
+  if (is.null(deps)) return(NULL)
+  
+  deps$package[deps$type %in% types]
+  
+}
+
+get_imports <- function(dir = ".") {
+  
+  if (!requireNamespace("pkgload", quietly = TRUE)) {
+    return(NULL)
+  }
+  
+  imports <- tryCatch(
+    pkgload::parse_ns_file(dir)$imports,
+    error = function(e) NULL
+  )
+  
+  if (is.null(imports)) return(NULL)
+  
+  out <- list(
+    pkgs = map(imports, function(x) if (length(x) == 1) x else NULL),
+    funs = map(imports, function(x) x[-1])
+  )
+  
+  map(out, unlist, use.names = FALSE)$pkgs
+  
+}

@@ -1,4 +1,4 @@
-subset_style_data <- function(x, file = NULL, package = NULL, fun = NULL) {
+subset_style_data <- function(x, file = NULL, pkg = NULL, fun = NULL) {
   
   if (!is.null(file) && !isTRUE(file)) {
     
@@ -24,12 +24,12 @@ subset_style_data <- function(x, file = NULL, package = NULL, fun = NULL) {
     
   }
   
-  if (!is.null(package) && !isTRUE(package)) {
+  if (!is.null(pkg) && !isTRUE(pkg)) {
     
     files      <- names(x)
-    pkgs       <- unique(unlist(map(x, ~ .x$parse_data$package)))
-    x          <- subset_by_pkg(x, package)
-    bad_inputs <- setdiff(package, pkgs)
+    pkgs       <- unique(unlist(map(x, ~ .x$parse_data$pkg)))
+    x          <- subset_by_pkg(x, pkg)
+    bad_inputs <- setdiff(pkg, pkgs)
     n_bad      <- length(bad_inputs)
     
     if (length(x) == 0) {
@@ -48,7 +48,7 @@ subset_style_data <- function(x, file = NULL, package = NULL, fun = NULL) {
   if (!is.null(fun) && !isTRUE(fun)) {
     
     files      <- names(x)
-    pkgs       <- unique(unlist(map(x, ~ .x$parse_data$package)))
+    pkgs       <- unique(unlist(map(x, ~ .x$parse_data$pkg)))
     funs       <- unique(unlist(map(x, ~ .x$parse_data$text)))
     x          <- subset_by_fun(x, fun)
     bad_inputs <- setdiff(fun, funs)
@@ -58,7 +58,7 @@ subset_style_data <- function(x, file = NULL, package = NULL, fun = NULL) {
       cli_abort(
         c("No calls were styled to {qty(n_bad)} function{?s} {.fun {bad_inputs}}",
           i = "Styled {qty(length(funs))} call{?s} were {.fun {funs}}",
-          i = if (!is.null(package)) {
+          i = if (!is.null(pkg)) {
             "Looking for calls inserted from {qty(length(pkgs))} package{?s} {.pkg {pkgs}}"
           },
           i = if (!is.null(file)) {
@@ -80,7 +80,7 @@ subset_by_file <- function(x, file) {
 
 subset_by_pkg <- function(x, pkg) {
   x <- map(x, function(xi) {
-    xi$parse_data <- xi$parse_data[xi$parse_data$package %in% pkg, ] 
+    xi$parse_data <- xi$parse_data[xi$parse_data$pkg %in% pkg, ] 
     xi
   })
   keep(x, ~ nrow(.x$parse_data) > 0)

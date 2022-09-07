@@ -3,7 +3,7 @@
 #' @export
 last_style <- function(x = NULL, 
                        file = NULL, 
-                       package = NULL,
+                       pkg = NULL,
                        fun = NULL,
                        reset = TRUE) {
   
@@ -15,15 +15,15 @@ last_style <- function(x = NULL,
   
   if (reset) set_cur_print(x)
   
-  x_small <- subset_style_data(x, file = file, package = package, fun = fun)
+  x_small <- subset_style_data(x, file = file, pkg = pkg, fun = fun)
   
   if (!is.null(fun)) {
     last_styled_lines(x_small)
     return(invisible(x))
   }
   
-  if (!is.null(package)) {
-    last_styled_tokens(x_small, package = TRUE)
+  if (!is.null(pkg)) {
+    last_styled_tokens(x_small, pkg = TRUE)
     return(invisible(x))
   }
   
@@ -32,37 +32,37 @@ last_style <- function(x = NULL,
   
 }
 
-# Prints files to package detail
+# Prints files to pkg detail
 #' @export
-last_styled_files <- function(x = last_style_data(), file = NULL, package = NULL, fun = NULL) {
+last_styled_files <- function(x = last_style_data(), file = NULL, pkg = NULL, fun = NULL) {
   
   if (exit_if_no_styles_yet(x)) {
     return(invisible(x))
   }
   
-  x_small <- subset_style_data(x, file = file, package = package, fun = fun)
+  x_small <- subset_style_data(x, file = file, pkg = pkg, fun = fun)
   
   imap(x, function(x, file) {
     
-    restyles   <- count(x$parse_data, "package")
+    restyles   <- count(x$parse_data, "pkg")
     restyles   <- restyles[order(-restyles$n), , drop = FALSE]
     restyles$n <- comma(restyles$n)
     restyles <- transform(
       restyles,
-      package = style_run(
-        sprintf('last_style(file = "%s", package = "%s", reset = FALSE)', file, package),
-        text = package
+      pkg = style_run(
+        sprintf('last_style(file = "%s", pkg = "%s", reset = FALSE)', file, pkg),
+        text = pkg
       )
     )
     
     file_view_pkgs <- style_run(
-      sprintf('last_style(file = "%s", package = TRUE)', file), 
+      sprintf('last_style(file = "%s", pkg = TRUE)', file), 
       text = file
     )
     
     cli_h2("Restyles in {.file {file_view_pkgs}}")
     map2(
-      restyles$n, restyles$package,
+      restyles$n, restyles$pkg,
       ~ cli_bullets(c("*" = "{.strong {.x}} from {.pkg {.y}}"))
     )
     
@@ -83,39 +83,39 @@ last_styled_files <- function(x = last_style_data(), file = NULL, package = NULL
   
 }
 
-# Prints packages to function detail
+# Prints pkgs to function detail
 #' @export
-last_styled_tokens <- function(x = last_style_data(), file = NULL, package = NULL, fun = NULL) {
+last_styled_tokens <- function(x = last_style_data(), file = NULL, pkg = NULL, fun = NULL) {
   
   if (exit_if_no_styles_yet(x)) {
     return(invisible(x))
   }
   
-  x_small <- subset_style_data(x, file = file, package = package, fun = fun)
+  x_small <- subset_style_data(x, file = file, pkg = pkg, fun = fun)
   
   imap(x, function(x, file) {
     
-    restyles   <- count(x$parse_data, "package", "text", "new_text")
-    restyles   <- restyles[order(restyles$package, -restyles$n), , drop = FALSE]
+    restyles   <- count(x$parse_data, "pkg", "text", "new_text")
+    restyles   <- restyles[order(restyles$pkg, -restyles$n), , drop = FALSE]
     restyles$n <- comma(restyles$n)
     restyles <- transform(
       restyles,
       new_text = style_run(
         sprintf(
-          'last_style(file = "%s", package = "%s", fun = "%s", reset = FALSE)', 
-          file, package, text
+          'last_style(file = "%s", pkg = "%s", fun = "%s", reset = FALSE)', 
+          file, pkg, text
         ),
         text = new_text
       )
     )
     
     file <- style_run(
-      sprintf('last_style(file = "%s", package = TRUE)', file), 
+      sprintf('last_style(file = "%s", pkg = TRUE)', file), 
       text = file
     )
     
-    extra_info <- if (!is.null(package)) {
-      format_inline("to functions from {.pkg {unique(restyles$package)}}")
+    extra_info <- if (!is.null(pkg)) {
+      format_inline("to functions from {.pkg {unique(restyles$pkg)}}")
     } 
     
     cli_h2("Restyles in {.file {file}} {extra_info}")
@@ -130,13 +130,13 @@ last_styled_tokens <- function(x = last_style_data(), file = NULL, package = NUL
 }
 
 #' @export
-last_styled_lines <- function(x = last_style_data(), file = NULL, package = NULL, fun = NULL) {
+last_styled_lines <- function(x = last_style_data(), file = NULL, pkg = NULL, fun = NULL) {
   
   if (exit_if_no_styles_yet(x)) {
     return(invisible(x))
   }
   
-  x_small <- subset_style_data(x, file = file, package = package, fun = fun)
+  x_small <- subset_style_data(x, file = file, pkg = pkg, fun = fun)
   
   imap(x, function(x, file) {
     
@@ -172,7 +172,7 @@ last_styled_lines <- function(x = last_style_data(), file = NULL, package = NULL
       }
       
       cli_h3(style_open_file(
-        file, paste("Line", line_n), 
+        file, paste("Line", comma(line_n)), 
         line = line_n, col = row$new_col1
       ))
       

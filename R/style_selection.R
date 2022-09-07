@@ -5,7 +5,7 @@ style_selection <- function(pkgs_from = c("global_option",
   
   code <- selected_code()
   
-  packages <- guess_pkgs(pkgs_from) # Should also return which functions not to style
+  pkgs <- guess_pkgs(pkgs_from) # Should also return which functions not to style
   
   styled_code <- style_code(code)
   
