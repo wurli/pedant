@@ -1,14 +1,3 @@
-#' Title
-#'
-#' @param code 
-#' @param use_pkgs 
-#' @param ignore_funs 
-#' @param src 
-#'
-#' @return
-#' @export
-#'
-#' @examples
 insert_dcs <- function(code, use_pkgs = NULL, ignore_funs = NULL, src = NULL) {
   
   original <- code
@@ -40,8 +29,6 @@ insert_dcs <- function(code, use_pkgs = NULL, ignore_funs = NULL, src = NULL) {
   pd <- pd[order(pd$line1, pd$col1), , drop = FALSE]
   pd <- transform(pd, new_col1 = col1, new_col2 = col2)
   
-  pd$shifts <- 0
-  
   code <- strsplit(code, "\n")[[1]]
   
   for (r in seq_len(nrow(pd))) {
@@ -51,14 +38,15 @@ insert_dcs <- function(code, use_pkgs = NULL, ignore_funs = NULL, src = NULL) {
     line       <- pd_row$line1 
     code[line] <- with(pd_row, replace_substr(code[line], new_col1, new_col2, new_text))
     
-    shift_col <- pd$line1 == pd_row$line1 & pd$new_col1 >= pd_row$new_col1
+    # Adjust `col1` and `col2` to account for new number of chars. This info
+    # is used for diagnostics printing
+    shift_col1 <- pd$line1 == pd_row$line1 & pd$new_col1 >  pd_row$new_col1
+    shift_col2 <- pd$line1 == pd_row$line1 & pd$new_col1 >= pd_row$new_col1
     
-    # Adjust `col1` and `col2` to account for new number of chars
     pd <- transform(
       pd, 
-      new_col1 = ifelse(shift_col, new_col1 + width_diff, new_col1),
-      new_col2 = ifelse(shift_col, new_col2 + width_diff, new_col2),
-      shifts = shifts + shift_col
+      new_col1 = ifelse(shift_col1, new_col1 + width_diff, new_col1),
+      new_col2 = ifelse(shift_col2, new_col2 + width_diff, new_col2)
     )
     
   }

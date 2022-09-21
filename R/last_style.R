@@ -138,6 +138,7 @@ last_styled_lines <- function(x = last_style_data(), file = NULL, pkg = NULL, fu
   
   x_small <- subset_style_data(x, file = file, pkg = pkg, fun = fun)
   
+  # For each set of style data...
   imap(x, function(x, file) {
     
     restyles   <- x$parse_data
@@ -155,12 +156,15 @@ last_styled_lines <- function(x = last_style_data(), file = NULL, pkg = NULL, fu
       
       lines <- subset(restyles, line1 == line_n)
       
+      # Get old and new lines of code
       old <- old_code[line_n]
       new <- new_code[line_n]
       
+      # Formatting functions for the old and new tokens
       fmt_old <- col_red
-      fmt_new <- col_green
+      fmt_new <- col_green # function(x) format_inline("{.help {x}}")
       
+      # For each styled token, apply formatting functions to both lines
       for (r in seq_len(nrow(lines))) {
         row <- lines[r, , drop = FALSE]
         old <- replace_substr(old, row$col1, row$col2, fmt_old)
