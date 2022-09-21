@@ -63,7 +63,7 @@ style_code <- function(code, use_pkgs = NULL, ignore_funs = NULL) {
   
   last_style()
   
-  invisible(out)
+  out$styled
   
 }
 

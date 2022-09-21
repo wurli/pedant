@@ -148,7 +148,7 @@ get_dependencies <- function(dir = ".",
   
 }
 
-get_imports <- function(dir = ".") {
+ns_imports <- function(dir = ".", what = c("pkgs", "funs")) {
   
   if (!is_installed("pkgload")) {
     return(NULL)
@@ -159,13 +159,32 @@ get_imports <- function(dir = ".") {
     error = function(e) NULL
   )
   
-  if (is.null(imports)) return(NULL)
+  if (is.null(imports)) {
+    return(NULL)
+  }
   
-  out <- list(
-    pkgs = map(imports, function(x) if (length(x) == 1) x else NULL),
-    funs = map(imports, function(x) x[-1])
-  )
+  if (what[1] == "pkgs") {
+    
+    pkgs <- map(imports, function(x) if (length(x) == 1) x else NULL)
+    return(unlist(pkgs, use.names = FALSE))
+    
+  } else if (what[1] == "funs") {
+    
+    funs <- map(imports, function(x) x[-1])
+    return(unlist(funs, use.names = FALSE))
+    
+  } else {
+    
+    cli_abort(c('Please use {.code what = "pkgs"} or {.code what = "funs"}'))
+    
+  }
   
-  map(out, unlist, use.names = FALSE)$pkgs
-  
+}
+
+imported_funs <- function(dir = ".") {
+  ns_imports(dir, "funs")
+}
+
+imported_pkgs <- function(dir = ".") {
+  ns_imports(dir, "pkgs")
 }

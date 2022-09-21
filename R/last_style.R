@@ -18,7 +18,7 @@ last_style <- function(x = NULL,
   x_small <- subset_style_data(x, file = file, pkg = pkg, fun = fun)
   
   if (!is.null(fun)) {
-    last_styled_lines(x_small)
+    last_styled_lines(x_small, fun = TRUE)
     return(invisible(x))
   }
   
@@ -144,7 +144,12 @@ last_styled_lines <- function(x = last_style_data(), file = NULL, pkg = NULL, fu
     old_code   <- strsplit(x$original, "\n")[[1]]
     new_code   <- strsplit(x$styled, "\n")[[1]]
     
-    cli_h2("Restyles in {.file {file}}")
+    tokens <- if (isTRUE(fun)) {
+      insertions <- sort(unique(restyles$new_text))
+      format_inline("to {.fun {insertions}}") 
+    }
+    
+    cli_h2("Restyles in {.file {file}} {tokens}")
     
     for (line_n in unique(restyles$line1)) {
       

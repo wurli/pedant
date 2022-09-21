@@ -74,6 +74,11 @@ justify <- function(x, just = c("left", "right", "centre")) {
   
 }
 
+# cli (>= 3.4.0)
+# style_run <- function(code, text = code) {
+#   cli::format_inline("{.run [{text}](pedant::{code})}")
+# }
+
 style_run <- function(code, text = code) {
   href <- paste0("ide:run:pedant::", code)
   style_hyperlink(text, href)
