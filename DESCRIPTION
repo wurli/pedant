@@ -2,15 +2,25 @@ Package: pedant
 Type: Package
 Title: Make Function Calls Explicit
 URL: https://github.com/wurli/pedant
-Version: 0.1.0
-Author: Jacob Scott
-Maintainer: Jacob Scott <jscott2718@gmail.com>
+Version: 0.1.1
+Authors@R: c(
+        person(
+        "Jacob", "Scott", 
+        email = "jscott2718@gmail.com", 
+        role = c("cre", "aut")
+    ),
+    person(
+        "Anatolii", "Tsyplenkov", 
+        email = "atsyplenkov@fastmail.com", 
+        role = "ctb",
+        comment = c(ORCID = "0000-0003-4144-8402")
+    ))
 Description: Transform code from using implicit function calls to explicit
    using the double-colon operator.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 Suggests: 
     dplyr,
