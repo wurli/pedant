@@ -2,7 +2,7 @@
   "name": "pedant",
   "displayName": "Pedant",
   "description": "A Positron extension to make function R function calls explicit",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "icon": "man/figures/logo.png",
   "repository": {
     "type": "git",
@@ -34,10 +34,21 @@
     "menus": {
       "editor/context": [
         {
-          "when": "editorHasSelection",
+          "when": "editorHasSelection && config.pedant.showContextMenu",
           "command": "pedant.makeRFunctionCallExplicit"
         }
       ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "Pedant Configuration",
+      "properties": {
+        "pedant.showContextMenu": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the 'Make R Function Call Explicit' command in the editor context menu"
+        }
+      }
     }
   },
   "scripts": {

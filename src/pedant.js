@@ -4,7 +4,6 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 
-
 async function makeRFunctionCallExplicit() {
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
