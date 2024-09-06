@@ -30,7 +30,15 @@
         "command": "pedant.installPedant",
         "title": "Pedant: Install Dependencies"
       }
-    ]
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "editorHasSelection",
+          "command": "pedant.makeRFunctionCallExplicit"
+        }
+      ]
+    }
   },
   "scripts": {
     "lint": "eslint .",
