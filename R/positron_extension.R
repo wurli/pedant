@@ -20,7 +20,9 @@ ic <- function(path) {
     tryCatch(
       {
         # Attempt to read the file, process it, and write the updated content
-        content <- readLines(path, encoding = "UTF-8") |> paste0(collapse = "\n")
+        content <-
+          readLines(path, encoding = "UTF-8", warn = FALSE) |>
+          paste0(collapse = "\n")
         updated_content <- pedant::add_double_colons(content)
         writeLines(enc2utf8(updated_content), con = path)
       },
