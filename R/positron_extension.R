@@ -14,12 +14,14 @@
 
 ic <- function(path) {
   if (!file.exists(path)) {
-    # If file does not exist, write an error message to the path
+    # If file does not exist, write
+    # an error message to the path
     writeLines("Error_002", con = path)
   } else {
     tryCatch(
       {
-        # Attempt to read the file, process it, and write the updated content
+        # Attempt to read the file, process it,
+        # and write the updated content
         content <-
           readLines(path, encoding = "UTF-8", warn = FALSE) |>
           paste0(collapse = "\n")
@@ -27,7 +29,8 @@ ic <- function(path) {
         writeLines(enc2utf8(updated_content), con = path)
       },
       error = function(e) {
-        # If an error occurs during the process, write an error message
+        # If an error occurs during the formating process,
+        # write an error message
         writeLines("Error_001", con = path)
       }
     )
