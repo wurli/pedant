@@ -2,3 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+node_modules/
+.vscode-test/
+*.vsix
+/.quarto/
