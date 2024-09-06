@@ -10,7 +10,7 @@
   },
   "homepage": "https://github.com/wurli/pedant",
   "bugs": {
-    "url": "https://github.com/wurli/pedant/issues/"
+    "url": "https://github.com/wurli/pedant/issues"
   },
   "engines": {
     "vscode": "^1.91.0"
