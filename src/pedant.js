@@ -74,7 +74,7 @@ async function makeRFunctionCallExplicit() {
 async function installPedant() {
     try {
         // const rCommand = `if (!requireNamespace("pedant", quietly = TRUE)) pak::pak('wurli/pedant')`;
-        const rCommand = `if (!(requireNamespace("pedant", quietly = TRUE) && packageVersion("pedant") >= "0.1.1")) pak::pak("atsyplenkov/pedant@positron-ext")`;
+        const rCommand = `if (!(requireNamespace("pedant", quietly = TRUE) && packageVersion("pedant") >= "0.1.1")) pak::pak("atsyplenkov/pedant@r-package")`;
 
         // Send the R command to the Positron Console
         await positron.runtime.executeCode('r', rCommand, false, true);

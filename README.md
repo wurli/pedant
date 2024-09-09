@@ -16,6 +16,7 @@ explicit function calls instead of implicit, either by running
 <img src="man/figures/addin-demo.gif" style="width:75.0%" alt="RStudio addin demo" /><figcaption aria-hidden="true">RStudio addin demo</figcaption>
 </figure>
 
+
 <figure>
 <img src="man/figures/positron-addin-demo.gif" style="width:75.0%" alt="Positron extension demo" /><figcaption aria-hidden="true">Positron extension demo</figcaption>
 </figure>

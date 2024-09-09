@@ -5,6 +5,10 @@ All notable changes to the "Pedant" Positron extension will be documented in thi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.5] - 2024-09-09
+- Created separate branches for R package and Positron Extension.
+- Changed position in the context menu.
+
 ## [0.0.4] - 2024-09-07
 - Added the context menu command
 - Extension settings `config.pedant.showContextMenu` to toggle on/off the presence in the context menu.

@@ -1,4 +1,0 @@
-Name: Make function calls explicit
-Description: E.g. `select()` becomes `dplyr::select()`.
-Binding: add_double_colons
-Interactive: true
