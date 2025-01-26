@@ -20,9 +20,19 @@ test_that("add_double_colons works", {
     "dplyr::tibble(x = 1); anotherPkg::some_fun()"
   )
 
+  expect_equal(
+    add_double_colons("utils::as.roman(12)", "utils"),
+    "utils::as.roman(12)"
+  )
+
   expect_warning(
     add_double_colons("tibble(x = 1); some_fun()", "dplyr"),
     "Couldn't find packages exporting 1 function\\(s\\): `some_fun\\(\\)`"
   )
-
+  
+  expect_warning(
+    add_double_colons("tibble(x = 1); some_fun()", "dplyr"),
+    "Couldn't find packages exporting 1 function\\(s\\): `some_fun\\(\\)`"
+  )
+  
 })
