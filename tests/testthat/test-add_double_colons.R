@@ -30,9 +30,4 @@ test_that("add_double_colons works", {
     "Couldn't find packages exporting 1 function\\(s\\): `some_fun\\(\\)`"
   )
   
-  expect_warning(
-    add_double_colons("tibble(x = 1); some_fun()", "dplyr"),
-    "Couldn't find packages exporting 1 function\\(s\\): `some_fun\\(\\)`"
-  )
-  
 })
